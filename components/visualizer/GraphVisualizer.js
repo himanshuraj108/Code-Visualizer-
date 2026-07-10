@@ -41,8 +41,12 @@ export default function GraphVisualizer({ stepData, eli5Mode }) {
     );
   }
 
-  const { visitedNodes = [], visitedEdges = [], currentNode, description, queue = [] } = stepData;
-  const graph = stepData.graph || GRAPH;
+  const visitedNodes = stepData.visitedNodes || stepData.state?.visitedNodes || stepData.state?.visited || [];
+  const visitedEdges = stepData.visitedEdges || stepData.state?.visitedEdges || [];
+  const currentNode = stepData.currentNode !== undefined ? stepData.currentNode : stepData.state?.currentNode;
+  const description = stepData.description;
+  const queue = stepData.queue || stepData.state?.queue || [];
+  const graph = stepData.graph || stepData.state?.graph || GRAPH;
 
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden">

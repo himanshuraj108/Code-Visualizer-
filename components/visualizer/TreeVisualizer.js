@@ -56,6 +56,68 @@ function buildBST(values) {
   return { nodes: nodesOut, edges: edgesOut, vw: Math.max(vw, 200), vh: Math.max(vh, 120), minX, minY };
 }
 
+function layoutCustomTree(rootObj) {
+  if (!rootObj || typeof rootObj !== "object") return null;
+
+  function getVal(node) {
+    if (!node) return null;
+    if (node.val !== undefined) return node.val;
+    if (node.value !== undefined) return node.value;
+    if (node.data !== undefined) return node.data;
+    if (node.key !== undefined) return node.key;
+    return null;
+  }
+
+  function getTreeHeight(node) {
+    if (!node) return 0;
+    return 1 + Math.max(getTreeHeight(node.left), getTreeHeight(node.right));
+  }
+
+  const height = getTreeHeight(rootObj);
+  const W = 760;
+  const nodesOut = [];
+  const edgesOut = [];
+
+  function layout(node, x, y, spread) {
+    if (!node) return;
+    const val = getVal(node);
+    if (val === null) return;
+    nodesOut.push({ id: val, val: val, x, y });
+    const childY = y + 72;
+    const childSpread = Math.max(24, spread / 1.7);
+    if (node.left) {
+      const leftVal = getVal(node.left);
+      if (leftVal !== null) {
+        edgesOut.push({ from: val, to: leftVal, x1: x, y1: y, x2: x - spread, y2: childY });
+        layout(node.left, x - spread, childY, childSpread);
+      }
+    }
+    if (node.right) {
+      const rightVal = getVal(node.right);
+      if (rightVal !== null) {
+        edgesOut.push({ from: val, to: rightVal, x1: x, y1: y, x2: x + spread, y2: childY });
+        layout(node.right, x + spread, childY, childSpread);
+      }
+    }
+  }
+
+  const initSpread = Math.min(180, W / (Math.pow(2, Math.ceil(height / 2)) * 0.8));
+  layout(rootObj, W / 2, 40, initSpread);
+
+  if (nodesOut.length === 0) return null;
+
+  const allX = nodesOut.map(n => n.x);
+  const allY = nodesOut.map(n => n.y);
+  const minX = Math.min(...allX) - 32;
+  const maxX = Math.max(...allX) + 32;
+  const minY = Math.min(...allY) - 32;
+  const maxY = Math.max(...allY) + 32;
+  const vw = maxX - minX;
+  const vh = maxY - minY;
+
+  return { nodes: nodesOut, edges: edgesOut, vw: Math.max(vw, 200), vh: Math.max(vh, 120), minX, minY };
+}
+
 const DEFAULT_VALUES = [50, 30, 70, 20, 40, 60, 80, 10, 25];
 
 const DIFF_LEGEND = [
@@ -77,11 +139,56 @@ export default function TreeVisualizer({ stepData, eli5Mode }) {
     );
   }
 
-  const rawNodes = stepData.nodes || [];
-  const rawEdges = stepData.edges || [];
-  const { currentNode, visited = [], description } = stepData;
+  const rawNodes = stepData.nodes || stepData.state?.nodes || [];
+  const rawEdges = stepData.edges || stepData.state?.edges || [];
+  const currentNode = stepData.currentNode !== undefined ? stepData.currentNode : stepData.state?.currentNode;
+  
+  // Smart visited list parsing to capture output prints or string lists
+  const rawVisited = stepData.visited || stepData.state?.visited || [];
+  let visitedList = [];
+  if (Array.isArray(rawVisited)) {
+    visitedList = rawVisited;
+  } else if (typeof rawVisited === "string") {
+    visitedList = rawVisited.trim().split(/[\s,->]+/);
+  }
+  if (visitedList.length === 0 && stepData.state) {
+    const keys = ["output", "path", "traversal", "print", "visitedNodes"];
+    for (const k of keys) {
+      const val = stepData.state[k];
+      if (typeof val === "string") {
+        const parts = val.trim().split(/[\s,->]+/);
+        if (parts.length > 0 && parts[0] !== "") visitedList = visitedList.concat(parts);
+      } else if (Array.isArray(val)) {
+        visitedList = visitedList.concat(val);
+      }
+    }
+  }
 
-  const { nodes, edges, vw, vh, minX, minY } =
+  const description = stepData.description;
+
+  // Look for a tree root variable in stepData.state to render changes dynamically
+  let customTreeLayout = null;
+  if (stepData.state) {
+    const treeKeys = ["root", "tree", "node", "head"];
+    for (const key of treeKeys) {
+      const val = stepData.state[key];
+      if (val && typeof val === "object" && (val.left !== undefined || val.right !== undefined || val.val !== undefined || val.value !== undefined)) {
+        customTreeLayout = layoutCustomTree(val);
+        if (customTreeLayout) break;
+      }
+    }
+    if (!customTreeLayout) {
+      const foundKey = Object.keys(stepData.state).find(k => {
+        const val = stepData.state[k];
+        return val && typeof val === "object" && (val.left !== undefined || val.right !== undefined);
+      });
+      if (foundKey) {
+        customTreeLayout = layoutCustomTree(stepData.state[foundKey]);
+      }
+    }
+  }
+
+  const layoutResult = customTreeLayout || (
     rawNodes.length > 0
       ? (() => {
           const allX = rawNodes.map(n => n.x);
@@ -92,7 +199,10 @@ export default function TreeVisualizer({ stepData, eli5Mode }) {
           const h  = Math.max(...allY) + 32 - mY;
           return { nodes: rawNodes, edges: rawEdges, vw: w, vh: h, minX: mX, minY: mY };
         })()
-      : buildBST(DEFAULT_VALUES);
+      : buildBST(DEFAULT_VALUES)
+  );
+
+  const { nodes, edges, vw, vh, minX, minY } = layoutResult;
 
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden">
@@ -129,8 +239,16 @@ export default function TreeVisualizer({ stepData, eli5Mode }) {
           })}
 
           {nodes.map((node) => {
-            const isCurrent = currentNode === node.val || currentNode === node.id;
-            const isVisited = visited.includes(node.val) || visited.includes(node.id);
+            const isCurrent = currentNode != null && (
+              String(currentNode) === String(node.val) ||
+              String(currentNode) === String(node.id) ||
+              String(currentNode).includes(`(${node.val})`) ||
+              String(currentNode).includes(` ${node.val}`)
+            );
+            const isVisited = visitedList.some(v =>
+              String(v) === String(node.val) ||
+              String(v) === String(node.id)
+            );
             const fill      = isCurrent ? "#f59e0b" : isVisited ? "#60a5fa" : "#f8fafc";
             const stroke    = isCurrent ? "#d97706" : isVisited ? "#3b82f6" : "#cbd5e1";
             const textFill  = isCurrent || isVisited ? "white" : "#475569";
@@ -161,11 +279,11 @@ export default function TreeVisualizer({ stepData, eli5Mode }) {
         </svg>
       </div>
 
-      {visited.length > 0 && (
+      {visitedList.length > 0 && (
         <div className="shrink-0 px-6 pb-4 flex items-center gap-3 flex-wrap border-t border-slate-100 pt-3">
           <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Traversal:</span>
           <div className="flex items-center gap-1.5 flex-wrap">
-            {visited.map((val, i) => (
+            {visitedList.map((val, i) => (
               <motion.div
                 key={`vis-${val}-${i}`}
                 initial={{ scale: 0, opacity: 0 }}

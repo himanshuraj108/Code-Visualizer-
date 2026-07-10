@@ -13,6 +13,8 @@ CRITICAL ACCURACY GUIDELINES:
    - Each state-changing line (variable initialization, loop condition check, comparison, array swap, index update, or return statement) must have its own step.
    - The "state" object for each step must contain all active variables, pointers, and array data at that exact moment.
    - For searching/array algorithms, the "state" object MUST include keys: "array" (the full array), "left" (left index pointer), "right" (right index pointer), "check_idx" (currently inspected index), "target" (search target), and any loop variable.
+   - For Tree algorithms, the "state" object MUST include: "currentNode" (the value/id of the tree node currently visited) and "visited" (an array containing values/ids of nodes traversed so far).
+   - For Graph algorithms, the "state" object MUST include: "currentNode" (the active vertex ID), "visitedNodes" (array of visited vertex IDs), "visitedEdges" (array of visited edge IDs, e.g. ["A-B", "B-C"]), and "queue" or "stack" if applicable.
    - When the target is found or returned, document the correct return value in the final step.
 
 Return ONLY valid JSON in this exact format:
