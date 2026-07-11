@@ -25,6 +25,8 @@ import { generateGenericSteps } from "@/lib/algorithms/genericSteps";
 import { tokenizeLine, TOKEN_COLORS, detectLang } from "@/lib/syntax/highlighter";
 import ArrayVisualizer from "./ArrayVisualizer";
 import CodeEditorPanel from "./CodeEditorPanel";
+import StackQueueVisualizer from "./StackQueueVisualizer";
+import LinkedListVisualizer from "./LinkedListVisualizer";
 
 const CAT_META = {
   arrays: {
@@ -327,7 +329,16 @@ export default function VisualizerClient() {
             {(selectedCategory === "arrays" || selectedCategory === "searching") && (
               <ArrayVisualizer stepData={currentGenericStep} algorithmId={selectedAlgorithm} eli5Mode={eli5Mode} />
             )}
-            {!["sorting","graph","tree","dp","arrays","searching"].includes(selectedCategory) && (
+            {selectedCategory === "datastructures" && (["stack","queue","min-stack","circular-queue"].includes(selectedAlgorithm)) && (
+              <StackQueueVisualizer stepData={currentGenericStep} algorithmId={selectedAlgorithm} eli5Mode={eli5Mode} />
+            )}
+            {selectedCategory === "datastructures" && (["linked-list","doubly-linked-list","floyd-cycle"].includes(selectedAlgorithm)) && (
+              <LinkedListVisualizer stepData={currentGenericStep} algorithmId={selectedAlgorithm} eli5Mode={eli5Mode} />
+            )}
+            {selectedCategory === "datastructures" && !["stack","queue","min-stack","circular-queue","linked-list","doubly-linked-list","floyd-cycle"].includes(selectedAlgorithm) && (
+              <ArrayVisualizer stepData={currentGenericStep} algorithmId={selectedAlgorithm} eli5Mode={eli5Mode} />
+            )}
+            {!["sorting","graph","tree","dp","arrays","searching","datastructures"].includes(selectedCategory) && (
               <GenericStepView stepData={currentGenericStep} analysis={null} eli5={eli5Mode} currentStep={currentStep} total={activeSteps.length} algorithmId={selectedAlgorithm} preferredLanguage={preferredLanguage} />
             )}
 
