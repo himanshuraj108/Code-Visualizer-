@@ -389,11 +389,9 @@ function WelcomeScreen({ onSelect }) {
         <ChevronLeft size={16} /> Back to Home
       </Link>
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-center mb-12">
-        <div className="flex items-center justify-center gap-3 mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-200">
-            <BarChart2 size={24} className="text-white" />
-          </div>
-          <span className="text-3xl font-extrabold text-slate-900 font-display tracking-tight">CodeViz</span>
+        <div className="flex flex-col items-center justify-center gap-1 mb-5">
+          <img src="/logo.svg" alt="YCV Logo" className="w-24 h-24" />
+          <span className="text-xs font-black text-slate-400 uppercase tracking-widest mt-1">Your Code Visualizer</span>
         </div>
         <h1 className="text-4xl font-extrabold text-slate-900 mb-3 font-display leading-tight">
           Learn Any Algorithm.<br />
@@ -532,70 +530,177 @@ function CategoryScreen({ onBack, onSelect }) {
 function AlgorithmScreen({ category, onBack, onSelect }) {
   const meta = CAT_META[category] || {
     label: category.charAt(0).toUpperCase() + category.slice(1),
-    icon: Code2,
-    color: "#475569",
-    bg: "from-slate-50 to-slate-100/30",
-    hoverBg: "hover:from-slate-100/50 hover:to-slate-200/50",
-    border: "border-slate-200",
-    shadow: "shadow-slate-100"
+    icon: Code2, color: "#6366f1",
   };
   const Icon = meta.icon;
   const algorithms = ALGORITHM_LIBRARY[category]?.algorithms || [];
 
+  const DIFF_BADGE = {
+    Beginner:     { label: "Beginner",     solid: "#10b981", text: "#fff" },
+    Intermediate: { label: "Intermediate", solid: "#f59e0b", text: "#fff" },
+    Advanced:     { label: "Advanced",     solid: "#ef4444", text: "#fff" },
+    Expert:       { label: "Expert",       solid: "#8b5cf6", text: "#fff" },
+  };
+
   return (
     <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
-      <div className="flex items-center gap-3 px-6 py-4 bg-white border-b border-slate-200 shrink-0">
-        <button onClick={onBack} className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-all">
+
+      {/* Header — colored gradient strip */}
+      <div
+        className="flex items-center gap-3 px-6 py-4 shrink-0 shadow-md"
+        style={{
+          background: `linear-gradient(135deg, ${meta.color}18 0%, #fff 70%)`,
+          borderBottom: `2.5px solid ${meta.color}30`,
+        }}
+      >
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1.5 text-sm font-bold text-slate-700 hover:text-white px-4 py-2 rounded-xl transition-all"
+          style={{ background: "#f1f5f9", border: "1.5px solid #e2e8f0" }}
+          onMouseOver={e => { e.currentTarget.style.background = meta.color; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = meta.color; }}
+          onMouseOut={e => { e.currentTarget.style.background = "#f1f5f9"; e.currentTarget.style.color = "#374151"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
+        >
           <ChevronLeft size={15} /> All Categories
         </button>
-        <div className="w-px h-5 bg-slate-200" />
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-white shadow-sm" style={{ color: meta.color }}>
-            <Icon size={16} />
+        <div className="w-px h-6 bg-slate-200" />
+
+        {/* Category icon + name */}
+        <div className="flex items-center gap-3">
+          <div
+            className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md"
+            style={{ background: `linear-gradient(135deg, ${meta.color}, ${meta.color}bb)`, boxShadow: `0 4px 14px ${meta.color}45` }}
+          >
+            <Icon size={20} className="text-white" />
           </div>
-          <h1 className="text-lg font-extrabold text-slate-900 tracking-tight">
-            {meta.label.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-          </h1>
+          <div>
+            <h1 className="text-xl font-black text-slate-900 tracking-tight leading-none">{meta.label}</h1>
+            <p className="text-xs font-semibold text-slate-500 mt-0.5">Select an algorithm to visualize step-by-step</p>
+          </div>
         </div>
-        <span className="text-xs text-slate-400 font-medium ml-1">— Pick an algorithm to visualize</span>
+
+        {/* Count pill */}
+        <div className="ml-auto">
+          <span
+            className="text-sm font-black px-4 py-2 rounded-xl shadow-sm"
+            style={{ background: `linear-gradient(135deg, ${meta.color}, ${meta.color}cc)`, color: "#fff", boxShadow: `0 4px 12px ${meta.color}40` }}
+          >
+            {algorithms.length} Algorithms
+          </span>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-8">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {algorithms.map((algo, i) => (
-            <motion.button
-              key={algo.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04, type: "spring", stiffness: 300, damping: 25 }}
-              onClick={() => onSelect(algo.id)}
-              className="group flex flex-col justify-between p-6 bg-white rounded-3xl border-2 border-slate-100 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50/40 transition-all duration-300 text-left hover:-translate-y-1.5"
-            >
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900 mb-3 tracking-tight group-hover:text-blue-600 transition-colors">
-                  {algo.name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                </h3>
-                <div className="flex flex-col gap-2 mb-6">
-                  <div className="flex items-center justify-between text-xs bg-slate-50 px-3 py-2 rounded-xl">
-                    <span className="text-slate-400">Time Complexity</span>
-                    <span className="font-extrabold text-slate-700 font-mono">{algo.complexity?.time || "—"}</span>
+      {/* Cards Grid */}
+      <div className="flex-1 overflow-y-auto p-7">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {algorithms.map((algo, i) => {
+            const diff = DIFF_BADGE[algo.difficulty] || DIFF_BADGE.Beginner;
+            return (
+              <motion.button
+                key={algo.id}
+                initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: i * 0.04, type: "spring", stiffness: 300, damping: 26 }}
+                onClick={() => onSelect(algo.id)}
+                whileHover={{ y: -6, scale: 1.02 }}
+                whileTap={{ scale: 0.975 }}
+                className="text-left bg-white rounded-3xl overflow-hidden flex flex-col group cursor-pointer relative"
+                style={{
+                  border: `1.5px solid ${meta.color}20`,
+                  boxShadow: `0 3px 18px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)`,
+                  transition: "all 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
+                }}
+              >
+                {/* Top thick colored gradient bar */}
+                <div
+                  className="h-2 w-full"
+                  style={{ background: `linear-gradient(90deg, ${meta.color}, ${meta.color}70, ${meta.color}30)` }}
+                />
+
+                {/* Card body */}
+                <div className="p-5 flex flex-col gap-4 flex-1">
+
+                  {/* Category icon + Difficulty badge row */}
+                  <div className="flex items-center justify-between">
+                    <div
+                      className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm"
+                      style={{ background: `${meta.color}15`, border: `2px solid ${meta.color}30` }}
+                    >
+                      <Icon size={20} style={{ color: meta.color }} />
+                    </div>
+
+                    {/* Difficulty badge — solid colored, fully visible */}
+                    <span
+                      className="text-xs font-extrabold px-3 py-1 rounded-xl tracking-wide"
+                      style={{
+                        background: diff.solid,
+                        color: diff.text,
+                        boxShadow: `0 2px 8px ${diff.solid}60`,
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {diff.label}
+                    </span>
                   </div>
-                  <div className="flex items-center justify-between text-xs bg-slate-50 px-3 py-2 rounded-xl">
-                    <span className="text-slate-400">Space Complexity</span>
-                    <span className="font-extrabold text-slate-700 font-mono">{algo.complexity?.space || "—"}</span>
+
+                  {/* Algorithm Name — BIG, BOLD, FULLY VISIBLE */}
+                  <h3
+                    className="text-base font-extrabold text-slate-900 leading-tight"
+                    style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a" }}
+                  >
+                    {algo.name}
+                  </h3>
+
+                  {/* Complexity — full contrast, visible */}
+                  <div className="flex flex-col gap-2">
+                    <div
+                      className="flex items-center justify-between px-3 py-2 rounded-xl"
+                      style={{ background: `${meta.color}08`, border: `1px solid ${meta.color}20` }}
+                    >
+                      <span className="flex items-center gap-1.5 text-xs font-bold" style={{ color: "#475569" }}>
+                        <Clock size={11} style={{ color: meta.color }} />
+                        Time Complexity
+                      </span>
+                      <span className="font-black font-mono text-xs" style={{ color: "#0f172a" }}>
+                        {algo.complexity?.time || "—"}
+                      </span>
+                    </div>
+                    <div
+                      className="flex items-center justify-between px-3 py-2 rounded-xl"
+                      style={{ background: `${meta.color}08`, border: `1px solid ${meta.color}20` }}
+                    >
+                      <span className="flex items-center gap-1.5 text-xs font-bold" style={{ color: "#475569" }}>
+                        <HardDrive size={11} style={{ color: meta.color }} />
+                        Space Complexity
+                      </span>
+                      <span className="font-black font-mono text-xs" style={{ color: "#0f172a" }}>
+                        {algo.complexity?.space || "—"}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center justify-between border-t border-slate-50 pt-4 w-full">
-                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${DIFF[algo.difficulty] || DIFF.Beginner}`}>
-                  {algo.difficulty.charAt(0).toUpperCase() + algo.difficulty.slice(1)}
-                </span>
-                <span className="flex items-center gap-1 text-xs font-bold text-blue-600">
-                  Visualize <ChevronRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                </span>
-              </div>
-            </motion.button>
-          ))}
+
+                {/* Bottom CTA — solid gradient button, fully visible */}
+                <motion.div
+                  className="mx-4 mb-4 py-3 rounded-2xl flex items-center justify-center gap-2 font-extrabold text-sm text-white cursor-pointer"
+                  style={{
+                    background: `linear-gradient(135deg, ${meta.color}, ${meta.color}cc)`,
+                    boxShadow: `0 4px 14px ${meta.color}40`,
+                    letterSpacing: "0.02em",
+                  }}
+                  whileHover={{ scale: 1.03, boxShadow: `0 6px 20px ${meta.color}60` }}
+                >
+                  <Zap size={14} />
+                  Visualize Now
+                </motion.div>
+
+                {/* Hover glow effect */}
+                <div
+                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                  style={{ boxShadow: `inset 0 0 0 2px ${meta.color}60, 0 12px 40px ${meta.color}20` }}
+                />
+              </motion.button>
+            );
+          })}
         </div>
       </div>
     </div>

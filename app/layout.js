@@ -20,11 +20,11 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = {
-  title: "CodeViz — World's Most Advanced Code Visualizer",
+  title: "YCV — Your Code Visualizer | AI-Powered Algorithm Learning",
   description: "Visualize any code, any algorithm, any language. AI-powered step-by-step visualization with 150+ built-in algorithms. Free forever.",
-  keywords: "code visualizer, algorithm visualization, data structures, sorting algorithms, graph algorithms, AI code analysis, free coding tool",
+  keywords: "code visualizer, algorithm visualization, data structures, sorting algorithms, graph algorithms, AI code analysis, YCV, your code visualizer",
   openGraph: {
-    title: "CodeViz — World's Most Advanced Code Visualizer",
+    title: "YCV — Your Code Visualizer | AI-Powered Algorithm Learning",
     description: "Visualize any code, any algorithm, any language. Free forever.",
     type: "website",
   },

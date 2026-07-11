@@ -152,11 +152,12 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center shadow-md shadow-blue-200">
-                <Code2 size={16} className="text-white" />
+              <img src="/logo.svg" alt="YCV Logo" className="w-14 h-14" />
+              <div className="flex flex-col">
+                <span className="text-lg font-black font-display text-slate-900 leading-none">YCV</span>
+                <span className="text-[10px] font-extrabold text-slate-500 tracking-wide mt-0.5 uppercase">Your Code Visualizer</span>
               </div>
-              <span className="text-lg font-bold font-display text-slate-900">CodeViz</span>
-              <span className="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">BETA</span>
+              <span className="text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full ml-1">BETA</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
               {["Features", "Algorithms", "How It Works"].map((item) => (
@@ -285,7 +286,7 @@ export default function LandingPage() {
               Built to Beat Every Tool Out There
             </h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-              Not just another visualizer. CodeViz is a complete learning platform powered by AI.
+              Not just another visualizer. YCV (Your Code Visualizer) is a complete learning platform powered by AI.
             </p>
           </motion.div>
 
@@ -423,11 +424,12 @@ export default function LandingPage() {
       <footer className="bg-slate-900 text-slate-400 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-                <Code2 size={16} className="text-white" />
+            <div className="flex items-center gap-3">
+              <img src="/logo.svg" alt="YCV Logo" className="w-16 h-16" />
+              <div className="flex flex-col">
+                <span className="text-lg font-black font-display text-white leading-none">YCV</span>
+                <span className="text-xs font-bold text-slate-400 mt-1">Your Code Visualizer</span>
               </div>
-              <span className="text-lg font-bold font-display text-white">CodeViz</span>
             </div>
             <p className="text-sm text-slate-500">
               The world's most advanced code visualizer. Built with passion. Free forever.
