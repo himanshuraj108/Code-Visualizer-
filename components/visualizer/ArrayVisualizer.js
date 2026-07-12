@@ -75,29 +75,25 @@ export default function ArrayVisualizer({ stepData, algorithmId, eli5Mode }) {
         <div className="relative flex flex-col items-center py-12 w-full max-w-3xl">
           <div className="flex items-center justify-center gap-3 w-full">
             {array.map((elementVal, idx) => {
-              let isLeft = (algorithmId === "two-pointers" && idx === left) ||
-                           (algorithmId === "dutch-national-flag" && idx === low) ||
-                           (algorithmId === "floyd-cycle" && idx === slow) ||
-                           (algorithmId.includes("search") && left !== undefined && idx === left);
+              let isLeft = (left !== undefined && idx === left) ||
+                           (low !== undefined && idx === low) ||
+                           (slow !== undefined && idx === slow);
 
-              let isRight = (algorithmId === "two-pointers" && idx === right) ||
-                            (algorithmId === "dutch-national-flag" && idx === high) ||
-                            (algorithmId === "floyd-cycle" && idx === fast) ||
-                            (algorithmId.includes("search") && right !== undefined && idx === right);
+              let isRight = (right !== undefined && idx === right) ||
+                            (high !== undefined && idx === high) ||
+                            (fast !== undefined && idx === fast);
 
-              let isMid = (algorithmId === "dutch-national-flag" && idx === mid) ||
-                          (algorithmId === "ternary-search" && idx === mid1) ||
-                          (algorithmId.includes("search") && check_idx !== undefined && idx === check_idx);
+              let isMid = (mid !== undefined && idx === mid) ||
+                          (mid1 !== undefined && idx === mid1) ||
+                          (check_idx !== undefined && idx === check_idx);
 
-              let isMid2 = (algorithmId === "ternary-search" && idx === mid2);
+              let isMid2 = (mid2 !== undefined && idx === mid2);
 
               let isWindow = (algorithmId === "sliding-window" && idx >= i && idx < i + k);
 
               let isIndexActive = (idx === i) &&
-                                  (algorithmId !== "sliding-window" &&
-                                   algorithmId !== "dutch-national-flag" &&
-                                   algorithmId !== "two-pointers" &&
-                                   !algorithmId.includes("search"));
+                                  !isLeft && !isRight && !isMid && !isMid2 &&
+                                  algorithmId !== "sliding-window";
 
               let blockBg = "bg-white border-slate-200 text-slate-700";
               let shadow = "shadow-sm";
@@ -121,20 +117,18 @@ export default function ArrayVisualizer({ stepData, algorithmId, eli5Mode }) {
                 shadow = "shadow-md shadow-violet-200";
               }
 
-              // Determine Arrow label
+              // Determine Arrow label dynamically based on state properties
               let arrowLabel = "";
-              if (algorithmId === "two-pointers") {
-                arrowLabel = isLeft ? "Left" : isRight ? "Right" : "";
-              } else if (algorithmId === "dutch-national-flag") {
-                arrowLabel = isLeft ? "Low" : isRight ? "High" : isMid ? "Mid" : "";
-              } else if (algorithmId === "floyd-cycle") {
-                arrowLabel = isLeft ? "Slow" : isRight ? "Fast" : "";
-              } else if (algorithmId === "ternary-search") {
-                arrowLabel = isLeft ? "Left" : isRight ? "Right" : isMid ? "Mid1" : isMid2 ? "Mid2" : "";
-              } else if (algorithmId.includes("search")) {
-                arrowLabel = isLeft ? "Left" : isRight ? "Right" : isMid ? "Mid" : "";
-              } else {
-                arrowLabel = isIndexActive ? "Index" : "";
+              if (isLeft) {
+                arrowLabel = (slow !== undefined && idx === slow) ? "Slow" : (low !== undefined && idx === low) ? "Low" : "Left";
+              } else if (isRight) {
+                arrowLabel = (fast !== undefined && idx === fast) ? "Fast" : (high !== undefined && idx === high) ? "High" : "Right";
+              } else if (isMid) {
+                arrowLabel = (mid1 !== undefined && idx === mid1) ? "Mid1" : (check_idx !== undefined && idx === check_idx) ? "Check" : "Mid";
+              } else if (isMid2) {
+                arrowLabel = "Mid2";
+              } else if (isIndexActive) {
+                arrowLabel = "Idx";
               }
 
                return (
